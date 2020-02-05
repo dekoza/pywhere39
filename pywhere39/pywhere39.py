@@ -1,7 +1,9 @@
 """Main module."""
+from fractions import Fraction as frac
+
 from .wordlist import words as _words
 
-TILE_SIZES = (5.625, 0.125, 0.00277777777, 0.00006172839, 0.00000308642)
+TILE_SIZES = (frac(45, 8), frac(1, 8), frac(1, 360), frac(1, 16200), frac(1, 324000))
 RASTER_SIZE = ((32, 64), (45, 45), (45, 45), (45, 45), (20, 20))
 
 
@@ -18,24 +20,20 @@ def to_coords(words):
     return lat, lng
 
 
-# ["slush", "battle", "damage", "dentist"]
-# 51.02561728383 13.723333332970014
-
-
 def to_words(lat, lng, count=4):
     count = 5 if count > 5 else count
     lat += 90
-    lng = (lng - 180) % 360 + 360
-    lng += 180
+    lng = (lng - 180) % 360
 
     words = []
 
     for i in range(count):
-        lat_idx = lat // TILE_SIZES[i]
-        lng_idx = lat // TILE_SIZES[i]
+        tile_size = TILE_SIZES[i]
+        lat_idx = lat // tile_size
+        lng_idx = lng // tile_size
 
-        lat -= lat_idx * TILE_SIZES[i]
-        lng -= lng_idx * TILE_SIZES[i]
+        lat -= lat_idx * tile_size
+        lng -= lng_idx * tile_size
 
         word_idx = int(lat_idx * RASTER_SIZE[i][1] + lng_idx)
         words.append(_words[word_idx])
